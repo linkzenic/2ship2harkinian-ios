@@ -1,0 +1,9 @@
+*.bin
+*.c
+*.cfg
+*.vtx.inc
+*.dlist.inc
+
+# Keep custom assets and generated declaration headers in source releases.
+!custom/**/*
+!2s2h_assets.h

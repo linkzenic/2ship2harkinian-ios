@@ -1,0 +1,72 @@
+name: Build unsigned tvOS release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing GitHub release tag to receive the tvOS IPA
+        required: true
+        default: v0.1.0-ios.1
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tvos-release-${{ inputs.release_tag }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 120
+    env:
+      TWO_SHIP_IOS_VERSION: 0.1.0
+      TWO_SHIP_IOS_BUILD_NUMBER: 1
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show build tools
+        run: |
+          xcodebuild -version
+          cmake --version
+
+      - name: Build unsigned Apple TV app
+        run: scripts/build-ios.sh --tvos-device
+
+      - name: Package unsigned Apple TV IPA
+        run: |
+          scripts/package-ios-unsigned.sh \
+            "build-tvos-device/mm/Release-appletvos/2Ship 2 Harkinian.app" \
+            "dist/2Ship-2-Harkinian-tvOS-unsigned.ipa"
+
+      - name: Verify public artifact
+        run: |
+          set -euo pipefail
+          test -f dist/2Ship-2-Harkinian-tvOS-unsigned.ipa
+          if unzip -l dist/2Ship-2-Harkinian-tvOS-unsigned.ipa |
+              grep -E '(_CodeSignature|embedded\.mobileprovision)'; then
+            echo "Signed material found in public artifact."
+            exit 1
+          fi
+          if strings dist/2Ship-2-Harkinian-tvOS-unsigned.ipa |
+              grep -E -i '(/Users/)'; then
+            echo "Private build metadata found in public artifact."
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 2Ship-2-Harkinian-tvOS-unsigned
+          path: dist/2Ship-2-Harkinian-tvOS-unsigned.ipa
+          if-no-files-found: error
+
+      - name: Attach to existing release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          gh release view "$RELEASE_TAG"
+          gh release upload "$RELEASE_TAG" \
+            dist/2Ship-2-Harkinian-tvOS-unsigned.ipa \
+            --clobber
