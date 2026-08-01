@@ -33,10 +33,10 @@ jobs:
 
       - name: Generate and build unsigned iOS app
         run: |
-          cmake -S . -B build-asset-generator -GXcode \
-            -DCMAKE_BUILD_TYPE=Release -DBUILD_CROWD_CONTROL=OFF \
-            -DINCLUDE_MPQ_SUPPORT=OFF
-          cmake --build build-asset-generator --target Generate2ShipOtr --config Release
+          scripts/configure-ios.sh --device
+          cmake --build build-ios-device --target Generate2ShipOtr --config Release -- \
+            PRODUCT_BUNDLE_IDENTIFIER=com.linkzenic.2ship.zapd \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
           test -s mm/2ship.o2r
           TWO_SHIP_O2R_PATH="$GITHUB_WORKSPACE/mm/2ship.o2r" scripts/build-ios.sh --device
 
