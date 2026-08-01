@@ -35,7 +35,8 @@ jobs:
         run: |
           scripts/configure-ios.sh --device
           cmake --build build-ios-device --target Generate2ShipOtr --config Release -- \
-            PRODUCT_BUNDLE_IDENTIFIER=com.linkzenic.2ship.zapd
+            PRODUCT_BUNDLE_IDENTIFIER=com.linkzenic.2ship.zapd \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
           TWO_SHIP_O2R_PATH="$GITHUB_WORKSPACE/mm/2ship.o2r" scripts/build-ios.sh --device
 
       - name: Package unsigned iOS IPA
