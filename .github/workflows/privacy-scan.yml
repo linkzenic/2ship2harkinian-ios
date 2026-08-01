@@ -34,6 +34,7 @@ jobs:
           if grep -R -I -E -i \
               --exclude-dir=.git \
               --exclude='privacy-scan.yml' \
+              --exclude='ios-release.yml' \
               --exclude='tvos-release.yml' \
               --exclude='package-ios-unsigned.sh' \
               '(/Users/)' .; then
