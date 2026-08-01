@@ -34,7 +34,8 @@ jobs:
       - name: Generate and build unsigned Apple TV app
         run: |
           scripts/configure-ios.sh --tvos-device
-          cmake --build build-tvos-device --target Generate2ShipOtr --config Release
+          cmake --build build-tvos-device --target Generate2ShipOtr --config Release -- \
+            PRODUCT_BUNDLE_IDENTIFIER=com.linkzenic.2ship.zapd
           TWO_SHIP_O2R_PATH="$GITHUB_WORKSPACE/mm/2ship.o2r" scripts/build-ios.sh --tvos-device
 
       - name: Package unsigned Apple TV IPA

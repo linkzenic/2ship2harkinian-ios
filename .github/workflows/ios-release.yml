@@ -34,7 +34,8 @@ jobs:
       - name: Generate and build unsigned iOS app
         run: |
           scripts/configure-ios.sh --device
-          cmake --build build-ios-device --target Generate2ShipOtr --config Release
+          cmake --build build-ios-device --target Generate2ShipOtr --config Release -- \
+            PRODUCT_BUNDLE_IDENTIFIER=com.linkzenic.2ship.zapd
           TWO_SHIP_O2R_PATH="$GITHUB_WORKSPACE/mm/2ship.o2r" scripts/build-ios.sh --device
 
       - name: Package unsigned iOS IPA
