@@ -34,7 +34,8 @@ jobs:
       - name: Generate and build unsigned Apple TV app
         run: |
           cmake -S . -B build-asset-generator -GXcode \
-            -DCMAKE_BUILD_TYPE=Release -DBUILD_CROWD_CONTROL=OFF
+            -DCMAKE_BUILD_TYPE=Release -DBUILD_CROWD_CONTROL=OFF \
+            -DINCLUDE_MPQ_SUPPORT=OFF
           cmake --build build-asset-generator --target Generate2ShipOtr --config Release
           test -s mm/2ship.o2r
           TWO_SHIP_O2R_PATH="$GITHUB_WORKSPACE/mm/2ship.o2r" scripts/build-ios.sh --tvos-device
