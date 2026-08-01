@@ -38,6 +38,7 @@ jobs:
         run: |
           cmake -S . -B build-asset-generator -GXcode \
             -DCMAKE_BUILD_TYPE=Release -DBUILD_CROWD_CONTROL=OFF \
+            -DBUILD_ARCHIVE_GENERATOR_ONLY=ON \
             -DINCLUDE_MPQ_SUPPORT=OFF \
             -DCMAKE_PREFIX_PATH="$(brew --prefix sdl2);$(brew --prefix glew);$(brew --prefix libzip);$(brew --prefix nlohmann-json);$(brew --prefix tinyxml2)" \
             -DGLEW_ROOT="$(brew --prefix glew)"
