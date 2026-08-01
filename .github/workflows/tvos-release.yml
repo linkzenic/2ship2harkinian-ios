@@ -32,14 +32,14 @@ jobs:
           cmake --version
 
       - name: Install archive generator prerequisite
-        run: brew install sdl2 glew
+        run: brew install sdl2 glew libzip nlohmann-json tinyxml2
 
       - name: Generate and build unsigned Apple TV app
         run: |
           cmake -S . -B build-asset-generator -GXcode \
             -DCMAKE_BUILD_TYPE=Release -DBUILD_CROWD_CONTROL=OFF \
             -DINCLUDE_MPQ_SUPPORT=OFF \
-            -DCMAKE_PREFIX_PATH="$(brew --prefix sdl2);$(brew --prefix glew)" \
+            -DCMAKE_PREFIX_PATH="$(brew --prefix sdl2);$(brew --prefix glew);$(brew --prefix libzip);$(brew --prefix nlohmann-json);$(brew --prefix tinyxml2)" \
             -DGLEW_ROOT="$(brew --prefix glew)"
           cmake --build build-asset-generator --target Generate2ShipOtr --config Release
           test -s mm/2ship.o2r
