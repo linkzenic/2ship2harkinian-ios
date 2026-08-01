@@ -20,6 +20,12 @@ dispatch_queue_t SyncQueue() {
     return queue;
 }
 
+bool IsProvisionedForCloudKit() {
+    NSNumber* provisioned =
+        [NSBundle.mainBundle objectForInfoDictionaryKey:@"TwoShipCloudKitProvisionedBuild"];
+    return provisioned == nil || provisioned.boolValue;
+}
+
 NSArray<NSString*>* SaveRelativePaths() {
     return @[
         @"saves/global.json",
@@ -226,12 +232,18 @@ NSString* RelativeSavePath(const char* path) {
 } // namespace
 
 extern "C" void TwoShipICloudSync_PrepareSaves(void) {
+    if (!IsProvisionedForCloudKit()) {
+        return;
+    }
     dispatch_sync(SyncQueue(), ^{
         ReconcilePaths(SaveRelativePaths(), true);
     });
 }
 
 extern "C" void TwoShipICloudSync_LocalSaveChanged(const char* path) {
+    if (!IsProvisionedForCloudKit()) {
+        return;
+    }
     NSString* relative = RelativeSavePath(path);
     if (relative == nil) {
         return;
@@ -242,6 +254,9 @@ extern "C" void TwoShipICloudSync_LocalSaveChanged(const char* path) {
 }
 
 extern "C" void TwoShipICloudSync_LocalSaveDeleted(const char* path) {
+    if (!IsProvisionedForCloudKit()) {
+        return;
+    }
     NSString* relative = RelativeSavePath(path);
     if (relative == nil) {
         return;

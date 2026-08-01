@@ -270,8 +270,22 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "iOS|tvOS")
         )
     endif()
     if(DEFINED TWO_SHIP_O2R_PATH AND EXISTS "${TWO_SHIP_O2R_PATH}")
-        target_sources(${PROJECT_NAME} PRIVATE "${TWO_SHIP_O2R_PATH}")
-        set_source_files_properties("${TWO_SHIP_O2R_PATH}" PROPERTIES
+        # Keep the archive's bundle name stable even when callers provide an
+        # arbitrary local filename. Runtime lookup is always 2ship.o2r.
+        set(TWO_SHIP_BUNDLED_O2R_PATH "${CMAKE_CURRENT_BINARY_DIR}/2ship.o2r")
+        add_custom_command(
+            OUTPUT "${TWO_SHIP_BUNDLED_O2R_PATH}"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${TWO_SHIP_O2R_PATH}"
+                "${TWO_SHIP_BUNDLED_O2R_PATH}"
+            DEPENDS "${TWO_SHIP_O2R_PATH}"
+            COMMENT "Preparing bundled 2ship.o2r"
+        )
+        add_custom_target(TwoShipBundledO2R DEPENDS "${TWO_SHIP_BUNDLED_O2R_PATH}")
+        add_dependencies(${PROJECT_NAME} TwoShipBundledO2R)
+        target_sources(${PROJECT_NAME} PRIVATE "${TWO_SHIP_BUNDLED_O2R_PATH}")
+        set_source_files_properties("${TWO_SHIP_BUNDLED_O2R_PATH}" PROPERTIES
+            GENERATED TRUE
             MACOSX_PACKAGE_LOCATION Resources
         )
     else()

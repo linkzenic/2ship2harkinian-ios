@@ -27,6 +27,10 @@ codesign --remove-signature "$PUBLIC_APP" 2>/dev/null || true
 rm -rf "$PUBLIC_APP/_CodeSignature"
 rm -f "$PUBLIC_APP/embedded.mobileprovision"
 
+# A self-signed public IPA cannot access Linkzenic's private CloudKit
+# container. Keep the local save workflow available without invoking it.
+/usr/libexec/PlistBuddy -c 'Set :TwoShipCloudKitProvisionedBuild false' "$PUBLIC_APP/Info.plist"
+
 if codesign --verify "$PUBLIC_APP" 2>/dev/null; then
     echo "Refusing to package an app that still has a code signature." >&2
     exit 1

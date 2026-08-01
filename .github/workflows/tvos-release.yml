@@ -6,7 +6,7 @@ on:
       release_tag:
         description: Existing GitHub release tag to receive the tvOS IPA
         required: true
-        default: v0.1.0-ios.1
+        default: v0.1.0-ios.2
 
 permissions:
   contents: write
@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 120
     env:
       TWO_SHIP_IOS_VERSION: 0.1.0
-      TWO_SHIP_IOS_BUILD_NUMBER: 1
+      TWO_SHIP_IOS_BUILD_NUMBER: 2
 
     steps:
       - uses: actions/checkout@v4
@@ -31,8 +31,11 @@ jobs:
           xcodebuild -version
           cmake --version
 
-      - name: Build unsigned Apple TV app
-        run: scripts/build-ios.sh --tvos-device
+      - name: Generate and build unsigned Apple TV app
+        run: |
+          scripts/configure-ios.sh --tvos-device
+          cmake --build build-tvos-device --target Generate2ShipOtr --config Release
+          TWO_SHIP_O2R_PATH="$GITHUB_WORKSPACE/mm/2ship.o2r" scripts/build-ios.sh --tvos-device
 
       - name: Package unsigned Apple TV IPA
         run: |

@@ -35,6 +35,8 @@
     </array>
     <key>NSLocalNetworkUsageDescription</key>
     <string>2Ship 2 Harkinian uses your local network to transfer game data and mods to Apple TV.</string>
+    <key>TwoShipCloudKitProvisionedBuild</key>
+    <true/>
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true/>
     <key>UILaunchScreen</key>

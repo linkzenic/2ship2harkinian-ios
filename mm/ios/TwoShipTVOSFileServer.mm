@@ -1,4 +1,5 @@
 #import "TwoShipTVOSFileServer.h"
+#import "TwoShipICloudSync.h"
 
 #import <Foundation/Foundation.h>
 #import <GameController/GameController.h>
@@ -139,8 +140,8 @@ NSData* TransferPage() {
          "<input id=modsFile type=file multiple accept='.o2r,.otr,.zip'>"
          "<button onclick=\"uploadFiles('mods','modsFile','modsProgress','modsStatus')\">Upload Mods</button>"
          "<progress id=modsProgress max=100 value=0></progress><div id=modsStatus class=status>Ready.</div></div>"
-         "<div class=card><h2>Save Files</h2><p>Save-slot JSON files and pictograph PNG files. Uploaded "
-         "saves join the private iCloud save-sync set.</p>"
+         "<div class=card><h2>Save Files</h2><p>Save-slot JSON files and pictograph PNG files. "
+         "Restart 2 Ship after uploading to load them.</p>"
          "<input id=savesFile type=file multiple accept='.json,.png'>"
          "<button onclick=\"uploadFiles('saves','savesFile','savesProgress','savesStatus')\">Upload Saves</button>"
          "<progress id=savesProgress max=100 value=0></progress><div id=savesStatus class=status>Ready.</div></div>"
@@ -438,6 +439,9 @@ void SendAndClose(nw_connection_t connection, NSData* response) {
                                 ? @"Restart 2 Ship to load the uploaded saves."
                                 : (isPreset ? @"Choose Refresh in Settings > Presets."
                                             : @"Choose Rescan in 2 Ship to load the uploaded files.");
+    if (isSave) {
+        TwoShipICloudSync_LocalSaveChanged(self.destinationPath.UTF8String);
+    }
     WriteStatus([NSString stringWithFormat:@"%@ uploaded. %@", self.displayName, instruction]);
     SendAndClose(self.connection, TextResponse(201, @"Created",
                                                [@"Upload complete. " stringByAppendingString:instruction]));
