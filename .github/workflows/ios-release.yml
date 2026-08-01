@@ -32,7 +32,7 @@ jobs:
           cmake --version
 
       - name: Install archive generator prerequisite
-        run: brew install sdl2 glew libzip nlohmann-json tinyxml2
+        run: brew install sdl2 glew libzip nlohmann-json tinyxml2 spdlog
 
       - name: Generate and build unsigned iOS app
         run: |
@@ -40,7 +40,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release -DBUILD_CROWD_CONTROL=OFF \
             -DBUILD_ARCHIVE_GENERATOR_ONLY=ON \
             -DINCLUDE_MPQ_SUPPORT=OFF \
-            -DCMAKE_PREFIX_PATH="$(brew --prefix sdl2);$(brew --prefix glew);$(brew --prefix libzip);$(brew --prefix nlohmann-json);$(brew --prefix tinyxml2)" \
+            -DCMAKE_PREFIX_PATH="$(brew --prefix sdl2);$(brew --prefix glew);$(brew --prefix libzip);$(brew --prefix nlohmann-json);$(brew --prefix tinyxml2);$(brew --prefix spdlog)" \
             -DGLEW_ROOT="$(brew --prefix glew)"
           cmake --build build-asset-generator --target Generate2ShipOtr --parallel 2
           test -s mm/2ship.o2r
