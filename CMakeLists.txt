@@ -103,7 +103,7 @@ endif()
 # Keeping it disabled also avoids shipping an unused dependency.
 if(CMAKE_SYSTEM_NAME MATCHES "iOS|tvOS")
     set(INCLUDE_MPQ_SUPPORT OFF)
-else()
+elseif(NOT DEFINED INCLUDE_MPQ_SUPPORT)
     set(INCLUDE_MPQ_SUPPORT ON)
 endif()
 
