@@ -217,7 +217,13 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Android" AND DEFINED ANDROID_VCPKG_ROOT)
 endif()
 add_subdirectory(ZAPDTR/ZAPD ${CMAKE_BINARY_DIR}/ZAPD)
 add_subdirectory(OTRExporter)
-if(CMAKE_SYSTEM_NAME MATCHES "iOS|tvOS")
+if(CMAKE_SYSTEM_NAME MATCHES "iOS|tvOS" OR BUILD_ARCHIVE_GENERATOR_ONLY)
+    if(BUILD_ARCHIVE_GENERATOR_ONLY)
+        # Imported package targets created inside libultraship are directory-scoped.
+        # The native exporter also needs these targets in this top-level scope.
+        find_package(tinyxml2 CONFIG REQUIRED COMPONENTS shared)
+        find_package(libzip CONFIG REQUIRED)
+    endif()
     target_link_libraries(OTRExporter PUBLIC
         tinyxml2::tinyxml2
         libzip::zip
