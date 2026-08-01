@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: macos-15
+    runs-on: macos-14
     timeout-minutes: 120
     env:
       TWO_SHIP_IOS_VERSION: 0.1.0
