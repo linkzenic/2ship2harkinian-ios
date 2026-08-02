@@ -75,6 +75,7 @@ jobs:
           if-no-files-found: error
 
       - name: Attach to existing release
+        if: github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ inputs.release_tag }}
