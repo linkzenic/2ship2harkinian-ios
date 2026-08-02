@@ -9,7 +9,6 @@
 #include <ship/window/Window.h>
 
 #ifdef __IOS__
-#include "../../ios/TwoShipICloudSync.h"
 #endif
 
 extern "C" {
@@ -123,7 +122,6 @@ void SaveManager_WriteSaveFile(const std::filesystem::path& fileName, nlohmann::
         o << std::setw(4) << j << std::endl;
         o.close();
 #ifdef __IOS__
-        TwoShipICloudSync_LocalSaveChanged(filePath.string().c_str());
 #endif
     } catch (...) { SPDLOG_ERROR("Failed to write save file"); }
 }
@@ -136,7 +134,6 @@ void SaveManager_DeleteSaveFile(const std::filesystem::path& fileName) {
         if (std::filesystem::exists(filePath)) {
             std::filesystem::remove(filePath);
 #ifdef __IOS__
-            TwoShipICloudSync_LocalSaveDeleted(filePath.string().c_str());
 #endif
         }
     } catch (...) { SPDLOG_ERROR("Failed to delete save file"); }

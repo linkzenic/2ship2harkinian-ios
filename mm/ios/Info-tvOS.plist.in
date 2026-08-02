@@ -32,11 +32,10 @@
     <key>NSBonjourServices</key>
     <array>
         <string>_2ship._tcp</string>
+        <string>_linkzenic-savebridge._tcp</string>
     </array>
     <key>NSLocalNetworkUsageDescription</key>
-    <string>2Ship 2 Harkinian uses your local network to transfer game data and mods to Apple TV.</string>
-    <key>TwoShipCloudKitProvisionedBuild</key>
-    <true/>
+    <string>2Ship 2 Harkinian uses your local network to transfer game data and mods and synchronize saves with Linkzenic Save Bridge.</string>
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true/>
     <key>UILaunchScreen</key>

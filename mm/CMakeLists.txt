@@ -102,8 +102,8 @@ source_group("include" FILES ${Header_Files__include})
 file(GLOB_RECURSE ship__ RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "2s2h/*.c" "2s2h/*.cpp" "2s2h/*.h" "2s2h/*.hpp")
 if(CMAKE_SYSTEM_NAME MATCHES "iOS|tvOS")
     list(APPEND ship__
-        ios/TwoShipICloudSync.h
-        ios/TwoShipICloudSync.mm
+        ios/TwoShipSaveBridgeSync.h
+        ios/TwoShipSaveBridgeSync.mm
         ios/Assets.xcassets
     )
     if(TWO_SHIP_APPLE_TARGET STREQUAL "tvos")
@@ -228,13 +228,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         OUTPUT_NAME "2s2h-macos"
     )
 elseif(CMAKE_SYSTEM_NAME MATCHES "iOS|tvOS")
-    set(TWO_SHIP_ICLOUD_CONTAINER_ID "iCloud.com.shipofharkinian.shared" CACHE STRING
-        "Shared CloudKit container for 2Ship on iPhone, iPad, and macOS")
-    configure_file(
-        "${CMAKE_CURRENT_SOURCE_DIR}/ios/TwoShipIOS.entitlements.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/TwoShipIOS.entitlements"
-        @ONLY
-    )
     if(TWO_SHIP_APPLE_TARGET STREQUAL "tvos")
         set(TWO_SHIP_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/ios/Info-tvOS.plist.in")
         set(TWO_SHIP_DEVICE_FAMILY "3")
@@ -250,15 +243,10 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "iOS|tvOS")
         MACOSX_BUNDLE_INFO_PLIST "${TWO_SHIP_INFO_PLIST}"
         OUTPUT_NAME "2Ship 2 Harkinian"
         XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES
-        XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_CURRENT_BINARY_DIR}/TwoShipIOS.entitlements"
         XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "${BUNDLE_ID}"
         XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "${TWO_SHIP_DEVICE_FAMILY}"
         XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME "${TWO_SHIP_APP_ICON}"
     )
-    target_compile_definitions(${PROJECT_NAME} PRIVATE
-        TWO_SHIP_ICLOUD_CONTAINER_ID="${TWO_SHIP_ICLOUD_CONTAINER_ID}"
-    )
-    target_link_libraries(${PROJECT_NAME} PRIVATE "-framework CloudKit")
     if(TWO_SHIP_APPLE_TARGET STREQUAL "tvos")
         target_compile_definitions(${PROJECT_NAME} PRIVATE "__TVOS__")
         target_link_libraries(${PROJECT_NAME} PRIVATE "-framework Network")

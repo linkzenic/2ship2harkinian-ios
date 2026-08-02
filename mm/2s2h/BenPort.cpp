@@ -69,7 +69,6 @@ CrowdControl* CrowdControl::Instance;
 #if !defined(__TVOS__)
 #include "../ios/TwoShipIOSTouchControls.h"
 #endif
-#include "../ios/TwoShipICloudSync.h"
 #if defined(__TVOS__)
 #include "../ios/TwoShipTVOSFileServer.h"
 #endif
@@ -236,10 +235,6 @@ OTRGlobals::OTRGlobals() {
     context->InitConsoleVariables();
 #if defined(__TVOS__)
     RemoveTVOSRightStickCButtonDefaults();
-#endif
-#ifdef __IOS__
-    // Reconcile saves before the file-select screen reads them.
-    TwoShipICloudSync_PrepareSaves();
 #endif
     context->InitControlDeck(std::make_shared<LUS::ControlDeck>(
         std::vector<CONTROLLERBUTTONS_T>{ BTN_CUSTOM_MODIFIER1, BTN_CUSTOM_MODIFIER2 }));

@@ -21,6 +21,9 @@
 #if defined(__TVOS__)
 #include "ios/TwoShipTVOSFileServer.h"
 #endif
+#if defined(__IOS__)
+#include "ios/TwoShipSaveBridgeSync.h"
+#endif
 #if defined(__ANDROID__)
 #include <jni.h>
 #include <SDL.h>
@@ -523,6 +526,27 @@ void BenMenu::AddSettings() {
             SDL_OpenURL(std::string("file:///" + std::filesystem::absolute(filesPath).string()).c_str());
         })
         .Options(ButtonOptions().Tooltip("Opens the folder that contains the save and mods folders, etc."));
+#endif
+
+#if defined(__IOS__)
+    AddWidget(path, "Save Bridge", WIDGET_SEPARATOR_TEXT);
+    AddWidget(path, "Save Bridge Pairing", WIDGET_CUSTOM).CustomFunction([](WidgetInfo& info) {
+        static char pairingCode[7] = {};
+        ImGui::TextUnformatted("Enter the six-digit code shown in Linkzenic Save Bridge on your Mac.");
+        ImGui::SetNextItemWidth(140.0f);
+        ImGui::InputText("Pairing Code", pairingCode, sizeof(pairingCode), ImGuiInputTextFlags_CharsDecimal);
+        ImGui::SameLine();
+        if (ImGui::Button("Pair with Save Bridge")) TwoShipSaveBridgeSync_Pair(pairingCode);
+    });
+    AddWidget(path, "Sync Saves with Save Bridge", WIDGET_BUTTON)
+        .Callback([](WidgetInfo& info) { TwoShipSaveBridgeSync_SyncNow(); });
+    AddWidget(path, "Save Bridge Status", WIDGET_CUSTOM).CustomFunction([](WidgetInfo& info) {
+        char status[384] = {};
+        TwoShipSaveBridgeSync_GetStatus(status, sizeof(status));
+        ImGui::PushTextWrapPos(ImGui::GetContentRegionAvail().x);
+        ImGui::TextUnformatted(status);
+        ImGui::PopTextWrapPos();
+    });
 #endif
 
 #if defined(__TVOS__)
