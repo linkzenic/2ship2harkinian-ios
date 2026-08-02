@@ -249,7 +249,7 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "iOS|tvOS")
     )
     if(TWO_SHIP_APPLE_TARGET STREQUAL "tvos")
         target_compile_definitions(${PROJECT_NAME} PRIVATE "__TVOS__")
-        target_link_libraries(${PROJECT_NAME} PRIVATE "-framework Network")
+        target_link_libraries(${PROJECT_NAME} PRIVATE "-framework Network" "-framework UIKit")
     endif()
     if(NOT SIGN_LIBRARY)
         set_target_properties(${PROJECT_NAME} PROPERTIES

@@ -530,6 +530,11 @@ void BenMenu::AddSettings() {
 
 #if defined(__IOS__)
     AddWidget(path, "Save Bridge", WIDGET_SEPARATOR_TEXT);
+#if defined(__TVOS__)
+    AddWidget(path, "Enter Save Bridge Pairing Code", WIDGET_BUTTON)
+        .Callback([](WidgetInfo& info) { TwoShipSaveBridgeSync_ShowPairingInput(); });
+    AddWidget(path, "Opens a native Apple TV keypad that works with the Siri Remote and controllers.", WIDGET_TEXT);
+#else
     AddWidget(path, "Save Bridge Pairing", WIDGET_CUSTOM).CustomFunction([](WidgetInfo& info) {
         static char pairingCode[7] = {};
         ImGui::TextUnformatted("Enter the six-digit code shown in Linkzenic Save Bridge on your Mac.");
@@ -538,6 +543,7 @@ void BenMenu::AddSettings() {
         ImGui::SameLine();
         if (ImGui::Button("Pair with Save Bridge")) TwoShipSaveBridgeSync_Pair(pairingCode);
     });
+#endif
     AddWidget(path, "Sync Saves with Save Bridge", WIDGET_BUTTON)
         .Callback([](WidgetInfo& info) { TwoShipSaveBridgeSync_SyncNow(); });
     AddWidget(path, "Save Bridge Status", WIDGET_CUSTOM).CustomFunction([](WidgetInfo& info) {

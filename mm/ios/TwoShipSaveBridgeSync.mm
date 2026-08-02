@@ -1,8 +1,111 @@
 #import "TwoShipSaveBridgeSync.h"
 
 #import <Foundation/Foundation.h>
+#if TARGET_OS_TV
+#import <UIKit/UIKit.h>
+#endif
 
 #include <cstring>
+
+#if TARGET_OS_TV
+@interface SaveBridgePairingViewController : UIViewController
+@property(nonatomic, strong) NSMutableString* code;
+@property(nonatomic, strong) UILabel* codeLabel;
+@end
+
+@implementation SaveBridgePairingViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.code = [NSMutableString string];
+    self.view.backgroundColor = [UIColor colorWithWhite:0.06 alpha:0.98];
+
+    UIStackView* content = [[UIStackView alloc] init];
+    content.translatesAutoresizingMaskIntoConstraints = NO;
+    content.axis = UILayoutConstraintAxisVertical;
+    content.alignment = UIStackViewAlignmentCenter;
+    content.spacing = 24;
+    [self.view addSubview:content];
+    [NSLayoutConstraint activateConstraints:@[
+        [content.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
+        [content.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor],
+        [content.widthAnchor constraintEqualToConstant:840],
+    ]];
+
+    UILabel* title = [[UILabel alloc] init];
+    title.text = @"Save Bridge pairing code";
+    title.font = [UIFont preferredFontForTextStyle:UIFontTextStyleTitle1];
+    [content addArrangedSubview:title];
+
+    self.codeLabel = [[UILabel alloc] init];
+    self.codeLabel.font = [UIFont monospacedDigitSystemFontOfSize:54 weight:UIFontWeightSemibold];
+    self.codeLabel.text = @"— — — — — —";
+    [content addArrangedSubview:self.codeLabel];
+
+    UILabel* help = [[UILabel alloc] init];
+    help.text = @"Use the remote or controller to select each number, then choose Pair.";
+    help.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+    [content addArrangedSubview:help];
+
+    const NSArray<NSArray<NSString*>*>* rows = @[ @[ @"1", @"2", @"3" ], @[ @"4", @"5", @"6" ], @[ @"7", @"8", @"9" ], @[ @"Clear", @"0", @"Delete" ] ];
+    for (NSArray<NSString*>* rowValues in rows) {
+        UIStackView* row = [[UIStackView alloc] init];
+        row.axis = UILayoutConstraintAxisHorizontal;
+        row.spacing = 20;
+        row.distribution = UIStackViewDistributionFillEqually;
+        for (NSString* value in rowValues) {
+            UIButton* button = [UIButton buttonWithType:UIButtonTypeSystem];
+            [button setTitle:value forState:UIControlStateNormal];
+            button.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleTitle2];
+            button.accessibilityIdentifier = value;
+            [button addTarget:self action:@selector(keyPressed:) forControlEvents:UIControlEventPrimaryActionTriggered];
+            [row addArrangedSubview:button];
+            [button.widthAnchor constraintEqualToConstant:190].active = YES;
+            [button.heightAnchor constraintEqualToConstant:72].active = YES;
+        }
+        [content addArrangedSubview:row];
+    }
+
+    UIStackView* actions = [[UIStackView alloc] init];
+    actions.axis = UILayoutConstraintAxisHorizontal;
+    actions.spacing = 28;
+    UIButton* cancel = [UIButton buttonWithType:UIButtonTypeSystem];
+    [cancel setTitle:@"Cancel" forState:UIControlStateNormal];
+    [cancel addTarget:self action:@selector(cancel:) forControlEvents:UIControlEventPrimaryActionTriggered];
+    UIButton* pair = [UIButton buttonWithType:UIButtonTypeSystem];
+    [pair setTitle:@"Pair" forState:UIControlStateNormal];
+    [pair addTarget:self action:@selector(pair:) forControlEvents:UIControlEventPrimaryActionTriggered];
+    [actions addArrangedSubview:cancel];
+    [actions addArrangedSubview:pair];
+    [content addArrangedSubview:actions];
+}
+
+- (void)keyPressed:(UIButton*)button {
+    NSString* value = button.accessibilityIdentifier;
+    if ([value isEqualToString:@"Clear"]) {
+        [self.code setString:@""];
+    } else if ([value isEqualToString:@"Delete"]) {
+        if (self.code.length > 0) [self.code deleteCharactersInRange:NSMakeRange(self.code.length - 1, 1)];
+    } else if (self.code.length < 6) {
+        [self.code appendString:value];
+    }
+    NSMutableArray<NSString*>* digits = [NSMutableArray arrayWithCapacity:6];
+    for (NSUInteger i = 0; i < 6; ++i) {
+        [digits addObject:i < self.code.length ? [self.code substringWithRange:NSMakeRange(i, 1)] : @"—"];
+    }
+    self.codeLabel.text = [digits componentsJoinedByString:@" "];
+}
+
+- (void)cancel:(id)sender { [self dismissViewControllerAnimated:YES completion:nil]; }
+
+- (void)pair:(id)sender {
+    if (self.code.length != 6) return;
+    TwoShipSaveBridgeSync_Pair(self.code.UTF8String);
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+@end
+#endif
 
 namespace {
 
@@ -248,6 +351,24 @@ extern "C" void TwoShipSaveBridgeSync_SyncNow(void) {
         }
         SyncWithManifest(manifest);
     });
+}
+
+extern "C" void TwoShipSaveBridgeSync_ShowPairingInput(void) {
+#if TARGET_OS_TV
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIWindow* window = UIApplication.sharedApplication.windows.firstObject;
+        UIViewController* presenter = window.rootViewController;
+        while (presenter.presentedViewController != nil) {
+            presenter = presenter.presentedViewController;
+        }
+        if (presenter == nil || [presenter isKindOfClass:SaveBridgePairingViewController.class]) {
+            return;
+        }
+        SaveBridgePairingViewController* input = [[SaveBridgePairingViewController alloc] init];
+        input.modalPresentationStyle = UIModalPresentationFullScreen;
+        [presenter presentViewController:input animated:YES completion:nil];
+    });
+#endif
 }
 
 extern "C" void TwoShipSaveBridgeSync_GetStatus(char* buffer, size_t bufferSize) {
