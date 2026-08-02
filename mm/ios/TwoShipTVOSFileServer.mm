@@ -1,5 +1,4 @@
 #import "TwoShipTVOSFileServer.h"
-#import "TwoShipICloudSync.h"
 
 #import <Foundation/Foundation.h>
 #import <GameController/GameController.h>
@@ -439,9 +438,6 @@ void SendAndClose(nw_connection_t connection, NSData* response) {
                                 ? @"Restart 2 Ship to load the uploaded saves."
                                 : (isPreset ? @"Choose Refresh in Settings > Presets."
                                             : @"Choose Rescan in 2 Ship to load the uploaded files.");
-    if (isSave) {
-        TwoShipICloudSync_LocalSaveChanged(self.destinationPath.UTF8String);
-    }
     WriteStatus([NSString stringWithFormat:@"%@ uploaded. %@", self.displayName, instruction]);
     SendAndClose(self.connection, TextResponse(201, @"Created",
                                                [@"Upload complete. " stringByAppendingString:instruction]));
